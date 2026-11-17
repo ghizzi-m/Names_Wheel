@@ -297,13 +297,13 @@
         /* أسماء الطالبات العائمة - تم تعديل اللون والشفافية */
         .floating-name {
             position: absolute;
-            color: var(--neon-pink); /* تغيير اللون للوردي النيون */
+            color: var(--neon-pink);
             font-size: 1.2rem;
             font-weight: bold;
-            text-shadow: 0 0 8px var(--neon-pink); /* توهج لزيادة الوضوح بدون إطار */
+            text-shadow: 0 0 8px var(--neon-pink);
             white-space: nowrap;
             transition: all 0.3s;
-            opacity: 0.9; /* تقليل الشفافية ليكون واضحا ومقروءا */
+            opacity: 0.9;
         }
 
         /* حالة التشغيل (Spinning Fast) */
@@ -456,7 +456,7 @@
         <div id="sidebar">
             <h2>الإعدادات</h2>
             
-            <textarea id="names-input" placeholder="أدخلي أسماء الطالبات هنا...&#10;كل اسم في سطر مستقل..."></textarea>
+            <textarea id="names-input" placeholder="ادخل أسماء الطلاب هنا...&#10;كل اسم في سطر مستقل..."></textarea>
             
             <button class="btn-cyan" onclick="updateNamesList()">إضافة وتحديث الأسماء</button>
             
@@ -466,7 +466,7 @@
             </div>
 
             <div class="counter-box">
-                الطالبات المتبقيات: <span id="remaining-count">0</span>
+                الطلاب المتبقون: <span id="remaining-count">0</span>
             </div>
 
             <button onclick="resetNames()">إعادة جميع الأسماء</button>
@@ -498,7 +498,7 @@
 
         <!-- مسرح اللعبة -->
         <div id="main-stage">
-            <h1 id="title">مين عليها الدور؟</h1>
+            <h1 id="title">من عليه الاختيار؟</h1>
 
             <div id="gate-container" onclick="handleGateClick()">
                 <div class="ring ring-1"></div>
@@ -509,7 +509,7 @@
                 <div id="floating-names-container"></div>
             </div>
 
-            <button id="start-btn-main" class="btn-cyan" onclick="startSelection()">شغّلي الاختيار 🚀</button>
+            <button id="start-btn-main" class="btn-cyan" onclick="startSelection()">ابدأ الاختيار 🚀</button>
         </div>
     </div>
 
@@ -523,7 +523,7 @@
     <div id="winner-screen">
         <div class="winner-title">الاختيار وقع على ✨</div>
         <div class="winner-name" id="winner-name-display">اسم الطالبة</div>
-        <div class="winner-subtitle">الدور لكِ الآن!</div>
+        <div class="winner-subtitle">الدور لك الآن!</div>
         <button class="close-winner" onclick="closeWinnerScreen()">متابعة</button>
     </div>
 
