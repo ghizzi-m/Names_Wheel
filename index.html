@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الاختيار الذكية</title>
+    <!-- استدعاء خط تجوال للغة العربية -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- مكتبة Confetti للاحتفال -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #050510;
+            --panel-bg: rgba(15, 15, 30, 0.85);
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-pink: #ff007f;
+            --text-light: #e0e0ff;
+            --font-main: 'Tajawal', sans-serif;
+            --ring-size: 350px;
+        }
+
+        /* الستايل البناتي - ألوان جديدة زاهية ومشرقة تناسب الابتدائي */
+        body.theme-girly {
+            --bg-color: #2a0825; 
+            --panel-bg: rgba(45, 10, 40, 0.85);
+            --neon-cyan: #ff007f; /* وردي فاقع */
+            --neon-purple: #7df9ff; /* سماوي مشع لكسر اللون */
+            --neon-pink: #ffb6c1; /* وردي باستيل ناعم */
+            --text-light: #fff0f5;
+            background-image: radial-gradient(circle at 50% 50%, #4a1540 0%, #2a0825 70%),
+                              repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 0, 127, 0.05) 2px, rgba(255, 0, 127, 0.05) 4px);
+        }
+        
+        body.theme-girly #sidebar {
+            border-left: 2px solid rgba(255, 0, 127, 0.4);
+        }
+
+        body.theme-girly .btn-cyan {
+            background: linear-gradient(45deg, #d81b60, var(--neon-cyan));
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
+        }
+        
+        body.theme-girly .btn-cyan:hover { 
+            box-shadow: 0 6px 20px rgba(255, 0, 127, 0.6); 
+        }
+
+        body.theme-girly .core {
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,0,127,0.4) 50%, transparent 100%);
+            box-shadow: 0 0 40px var(--neon-cyan);
+        }
+
+        /* نهاية الستايل البناتي */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 50%, #1a1a3a 0%, #050510 70%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 243, 255, 0.03) 2px, rgba(0, 243, 255, 0.03) 4px);
+            color: var(--text-light);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* تخطيط الشاشة الرئيسية */
+        #app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: all 0.5s ease;
+        }
+
+        /* لوحة التحكم الجانبية */
+        #sidebar {
+            width: 320px;
+            background: var(--panel-bg);
+            border-left: 2px solid rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            transition: transform 0.4s ease;
+        }
+
+        #sidebar h2 {
+            color: var(--neon-cyan);
+            font-weight: 900;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--neon-purple);
+            border-radius: 8px;
+            color: white;
+            padding: 10px;
+            font-family: var(--font-main);
+            resize: none;
+            outline: none;
+            transition: box-shadow 0.3s;
+        }
+        
+        textarea:focus {
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.5);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .control-group input[type="checkbox"], .style-options input[type="radio"] {
+            accent-color: var(--neon-cyan);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        button {
+            background: linear-gradient(45deg, var(--neon-purple), #6a0dad);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: var(--font-main);
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(188, 19, 254, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(188, 19, 254, 0.6);
+            filter: brightness(1.2);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .btn-cyan {
+            background: linear-gradient(45deg, #0077b6, var(--neon-cyan));
+            box-shadow: 0 4px 15px rgba(0, 243, 255, 0.4);
+            color: #000;
+        }
+        .btn-cyan:hover { box-shadow: 0 6px 20px rgba(0, 243, 255, 0.6); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: none;
+        }
+        .btn-outline:hover { background: rgba(0, 243, 255, 0.1); box-shadow: 0 0 10px rgba(0,243,255,0.3); }
+
+        /* صندوق العداد */
+        .counter-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .counter-box span {
+            color: var(--neon-pink);
+            font-weight: 900;
+            font-size: 1.2rem;
+            text-shadow: 0 0 8px rgba(255, 0, 127, 0.5);
+        }
+
+        /* خيارات الستايل */
+        .style-options {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        .style-options label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        /* مسرح اللعبة (Main Stage) */
+        #main-stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        #title {
+            position: absolute;
+            top: 40px;
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+            letter-spacing: 2px;
+            z-index: 2;
+        }
+
+        /* بوابة الاختيار (The Gate) */
+        #gate-container {
+            position: relative;
+            width: var(--ring-size);
+            height: var(--ring-size);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: all 0.5s ease;
+        }
+
+        .ring-1 {
+            width: 100%;
+            height: 100%;
+            border-top: 4px solid var(--neon-cyan);
+            border-bottom: 4px solid var(--neon-cyan);
+            box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 20px var(--neon-cyan);
+            animation: spin 15s linear infinite;
+        }
+
+        .ring-2 {
+            width: 80%;
+            height: 80%;
+            border-left: 3px dashed var(--neon-purple);
+            border-right: 3px dashed var(--neon-purple);
+            box-shadow: 0 0 15px var(--neon-purple), inset 0 0 15px var(--neon-purple);
+            animation: spin-reverse 10s linear infinite;
+        }
+
+        .ring-3 {
+            width: 60%;
+            height: 60%;
+            border-top: 2px dotted var(--neon-pink);
+            border-bottom: 2px dotted var(--neon-pink);
+            box-shadow: 0 0 10px var(--neon-pink);
+            animation: spin 7s linear infinite;
+        }
+
+        .core {
+            width: 30%;
+            height: 30%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(0,243,255,0.4) 50%, transparent 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 40px var(--neon-cyan);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* أسماء الطالبات العائمة - تم تعديل اللون والشفافية */
+        .floating-name {
+            position: absolute;
+            color: var(--neon-pink); /* تغيير اللون للوردي النيون */
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 8px var(--neon-pink); /* توهج لزيادة الوضوح بدون إطار */
+            white-space: nowrap;
+            transition: all 0.3s;
+            opacity: 0.9; /* تقليل الشفافية ليكون واضحا ومقروءا */
+        }
+
+        /* حالة التشغيل (Spinning Fast) */
+        .spinning-fast .ring-1 { animation: spin 0.8s linear infinite; box-shadow: 0 0 40px var(--neon-cyan), inset 0 0 40px var(--neon-cyan); }
+        .spinning-fast .ring-2 { animation: spin-reverse 0.6s linear infinite; box-shadow: 0 0 35px var(--neon-purple), inset 0 0 35px var(--neon-purple); }
+        .spinning-fast .ring-3 { animation: spin 0.4s linear infinite; box-shadow: 0 0 25px var(--neon-pink); }
+        .spinning-fast .core { animation: pulse 0.2s ease-in-out infinite; box-shadow: 0 0 80px white; }
+        .spinning-fast .floating-name { opacity: 0; transform: scale(0); }
+
+        #start-btn-main {
+            position: absolute;
+            bottom: 50px;
+            font-size: 1.8rem;
+            padding: 15px 40px;
+            border-radius: 50px;
+            z-index: 2;
+        }
+
+        /* تأثير الفلاش الأبيض */
+        #flash-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-out;
+        }
+
+        /* شاشة إعلان الفائزة */
+        #winner-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 5, 16, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            backdrop-filter: blur(15px);
+        }
+
+        #winner-screen.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .winner-title {
+            color: var(--neon-cyan);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--neon-cyan);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.5s ease 0.3s;
+        }
+
+        .winner-name {
+            font-size: 6rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 
+                0 0 20px var(--neon-purple),
+                0 0 40px var(--neon-purple),
+                0 0 80px var(--neon-pink);
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.6s;
+            text-align: center;
+        }
+
+        .winner-subtitle {
+            color: var(--neon-pink);
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px var(--neon-pink);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease 1s;
+        }
+
+        #winner-screen.show .winner-title,
+        #winner-screen.show .winner-name,
+        #winner-screen.show .winner-subtitle {
+            opacity: 1;
+            transform: none;
+            transform: scale(1);
+        }
+
+        .close-winner {
+            margin-top: 50px;
+            background: transparent;
+            border: 2px solid white;
+            box-shadow: none;
+            opacity: 0;
+            transition: all 0.5s ease 1.5s;
+        }
+        .close-winner:hover { background: white; color: black; }
+        #winner-screen.show .close-winner { opacity: 1; }
+
+        /* وضع التسجيل (Presentation Mode) */
+        body.presentation-mode #sidebar {
+            transform: translateX(100%);
+            position: absolute;
+        }
+        body.presentation-mode #start-btn-main {
+            display: none;
+        }
+        
+        #exit-presentation {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            display: none;
+            background: rgba(0,0,0,0.5);
+        }
+        body.presentation-mode #exit-presentation {
+            display: flex;
+        }
+
+        /* Animations */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+        @keyframes pulse { 
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* الاستجابة للشاشات (Responsive) */
+        @media (max-width: 768px) {
+            #app-container { flex-direction: column; }
+            #sidebar { width: 100%; height: auto; max-height: 40vh; overflow-y: auto; border-left: none; border-bottom: 2px solid var(--neon-cyan); }
+            body.presentation-mode #sidebar { transform: translateY(-100%); }
+            #title { font-size: 2rem; top: 20px; }
+            :root { --ring-size: 250px; }
+            .winner-name { font-size: 3.5rem; }
+            #start-btn-main { bottom: 20px; font-size: 1.2rem; padding: 10px 20px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- لوحة التحكم -->
+        <div id="sidebar">
+            <h2>الإعدادات</h2>
+            
+            <textarea id="names-input" placeholder="أدخلي أسماء الطالبات هنا...&#10;كل اسم في سطر مستقل..."></textarea>
+            
+            <button class="btn-cyan" onclick="updateNamesList()">إضافة وتحديث الأسماء</button>
+            
+            <div class="control-group">
+                <input type="checkbox" id="remove-after" checked>
+                <label for="remove-after">إزالة الاسم بعد اختياره</label>
+            </div>
+
+            <div class="counter-box">
+                الطالبات المتبقيات: <span id="remaining-count">0</span>
+            </div>
+
+            <button onclick="resetNames()">إعادة جميع الأسماء</button>
+            
+            <button class="btn-outline" onclick="toggleSound()" id="sound-btn">
+                🔊 إيقاف الصوت
+            </button>
+
+            <!-- وضع الأزرار بجانب بعضهما مع تصغير الحجم -->
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-outline" style="flex: 1; font-size: 0.9rem;" onclick="toggleFullscreen()">
+                    ⛶ وضع التكبير
+                </button>
+                <button class="btn-outline" style="flex: 1; border-color: var(--neon-pink); color: var(--neon-pink); font-size: 0.9rem;" onclick="enablePresentationMode()">
+                    👁 وضع التسجيل
+                </button>
+            </div>
+
+            <!-- خيارات الستايل -->
+            <div class="style-options">
+                <label>
+                    <input type="radio" name="theme-radio" id="theme-default" checked onclick="setTheme('default')"> ستايل 1
+                </label>
+                <label>
+                    <input type="radio" name="theme-radio" id="theme-girly" onclick="setTheme('girly')"> ستايل 2
+                </label>
+            </div>
+        </div>
+
+        <!-- مسرح اللعبة -->
+        <div id="main-stage">
+            <h1 id="title">مين عليها الدور؟</h1>
+
+            <div id="gate-container" onclick="handleGateClick()">
+                <div class="ring ring-1"></div>
+                <div class="ring ring-2"></div>
+                <div class="ring ring-3"></div>
+                <div class="core"></div>
+                <!-- الحاويات للأسماء العائمة -->
+                <div id="floating-names-container"></div>
+            </div>
+
+            <button id="start-btn-main" class="btn-cyan" onclick="startSelection()">شغّلي الاختيار 🚀</button>
+        </div>
+    </div>
+
+    <!-- زر الخروج من وضع التسجيل -->
+    <button id="exit-presentation" class="btn-outline" onclick="disablePresentationMode()">الخروج من وضع التسجيل ✕</button>
+
+    <!-- الفلاش الأبيض -->
+    <div id="flash-overlay"></div>
+
+    <!-- شاشة الفائزة -->
+    <div id="winner-screen">
+        <div class="winner-title">الاختيار وقع على ✨</div>
+        <div class="winner-name" id="winner-name-display">اسم الطالبة</div>
+        <div class="winner-subtitle">الدور لكِ الآن!</div>
+        <button class="close-winner" onclick="closeWinnerScreen()">متابعة</button>
+    </div>
+
+    <script>
+        // المتغيرات الأساسية
+        let allNames = [];
+        let availableNames = [];
+        let isSpinning = false;
+        let soundEnabled = true;
+        let audioCtx = null;
+        let suspenseOscillator = null;
+        let suspenseGain = null;
+
+        // عناصر DOM
+        const namesInput = document.getElementById('names-input');
+        const removeAfterCb = document.getElementById('remove-after');
+        const remainingCount = document.getElementById('remaining-count');
+        const gateContainer = document.getElementById('gate-container');
+        const flashOverlay = document.getElementById('flash-overlay');
+        const winnerScreen = document.getElementById('winner-screen');
+        const winnerNameDisplay = document.getElementById('winner-name-display');
+        const floatingNamesContainer = document.getElementById('floating-names-container');
+        const soundBtn = document.getElementById('sound-btn');
+
+        // تهيئة اللعبة عند التحميل
+        window.onload = () => {
+            loadData();
+            createFloatingNames();
+            setInterval(updateFloatingNames, 2000); // تحديث الأسماء العائمة كل ثانيتين
+        };
+
+        // إدارة البيانات المحلية (LocalStorage)
+        function loadData() {
+            const savedAll = localStorage.getItem('smartGate_allNames');
+            const savedAvailable = localStorage.getItem('smartGate_availableNames');
+            const savedRemove = localStorage.getItem('smartGate_removeAfter');
+
+            if (savedAll) {
+                allNames = JSON.parse(savedAll);
+                namesInput.value = allNames.join('\n');
+            }
+            if (savedAvailable) {
+                availableNames = JSON.parse(savedAvailable);
+            } else {
+                availableNames = [...allNames];
+            }
+            if (savedRemove !== null) {
+                removeAfterCb.checked = savedRemove === 'true';
+            }
+
+            updateUI();
+        }
+
+        function saveData() {
+            localStorage.setItem('smartGate_allNames', JSON.stringify(allNames));
+            localStorage.setItem('smartGate_availableNames', JSON.stringify(availableNames));
+            localStorage.setItem('smartGate_removeAfter', removeAfterCb.checked);
+        }
+
+        function updateNamesList() {
+            const lines = namesInput.value.split('\n');
+            allNames = lines.map(n => n.trim()).filter(n => n.length > 0);
+            availableNames = [...allNames];
+            saveData();
+            updateUI();
+            
+            // وميض تأكيد
+            namesInput.style.boxShadow = "0 0 20px #00f3ff";
+            setTimeout(() => namesInput.style.boxShadow = "none", 500);
+        }
+
+        function resetNames() {
+            availableNames = [...allNames];
+            saveData();
+            updateUI();
+        }
+
+        function updateUI() {
+            remainingCount.innerText = availableNames.length;
+        }
+
+        removeAfterCb.addEventListener('change', saveData);
+
+        // وظيفة تغيير الستايل
+        function setTheme(themeName) {
+            if(themeName === 'girly') {
+                document.body.classList.add('theme-girly');
+            } else {
+                document.body.classList.remove('theme-girly');
+            }
+        }
+
+        // إعداد الصوت (Web Audio API)
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundBtn.innerHTML = soundEnabled ? '🔊 إيقاف الصوت' : '🔇 تشغيل الصوت';
+        }
+
+        function playSuspenseSound() {
+            if (!soundEnabled) return;
+            initAudio();
+            
+            const duration = 4.5;
+            const now = audioCtx.currentTime;
+            
+            suspenseOscillator = audioCtx.createOscillator();
+            suspenseGain = audioCtx.createGain();
+            
+            suspenseOscillator.type = 'sawtooth';
+            
+            // تدرج التردد (زيادة السرعة والحدة)
+            suspenseOscillator.frequency.setValueAtTime(50, now);
+            suspenseOscillator.frequency.exponentialRampToValueAtTime(800, now + duration);
+            
+            // تدرج الصوت
+            suspenseGain.gain.setValueAtTime(0, now);
+            suspenseGain.gain.linearRampToValueAtTime(0.2, now + 0.5);
+            suspenseGain.gain.linearRampToValueAtTime(0.3, now + duration - 0.5);
+            suspenseGain.gain.linearRampToValueAtTime(0, now + duration);
+            
+            // تأثير متقطع يشبه الطبول أو الرادار باستخدام LFO
+            const lfo = audioCtx.createOscillator();
+            lfo.type = 'square';
+            lfo.frequency.setValueAtTime(5, now);
+            lfo.frequency.linearRampToValueAtTime(20, now + duration); // تسريع التقطيع
+            
+            const lfoGain = audioCtx.createGain();
+            lfoGain.gain.value = 1;
+            
+            lfo.connect(lfoGain.gain);
+            suspenseOscillator.connect(suspenseGain).connect(audioCtx.destination);
+            
+            // ربط LFO بصوت المذبذب الرئيسي لعمل التقطيع
+            const vca = audioCtx.createGain();
+            vca.gain.value = 0;
+            lfo.connect(vca.gain);
+            suspenseOscillator.disconnect();
+            suspenseOscillator.connect(vca);
+            vca.connect(suspenseGain);
+
+            suspenseOscillator.start(now);
+            lfo.start(now);
+            
+            suspenseOscillator.stop(now + duration);
+            lfo.stop(now + duration);
+        }
+
+        function playSuccessSound() {
+            if (!soundEnabled) return;
+            initAudio();
+            
+            const now = audioCtx.currentTime;
+            // تآلف موسيقي احتفالي (C5, E5, G5, C6)
+            const frequencies = [523.25, 659.25, 783.99, 1046.50]; 
+            
+            frequencies.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                
+                gain.gain.setValueAtTime(0, now + (index * 0.1));
+                gain.gain.linearRampToValueAtTime(0.3, now + (index * 0.1) + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 2 + (index * 0.1));
+                
+                osc.connect(gain).connect(audioCtx.destination);
+                osc.start(now + (index * 0.1));
+                osc.stop(now + 2.5);
+            });
+        }
+
+        // الأسماء العائمة كـ "هولوجرام"
+        function createFloatingNames() {
+            floatingNamesContainer.innerHTML = '';
+            for(let i=0; i<6; i++) {
+                const el = document.createElement('div');
+                el.className = 'floating-name';
+                floatingNamesContainer.appendChild(el);
+            }
+        }
+
+        function updateFloatingNames() {
+            if(isSpinning || availableNames.length === 0) return;
+            
+            const elements = document.querySelectorAll('.floating-name');
+            const radius = 220; // مسافة الدوران
+            
+            elements.forEach((el, index) => {
+                const randomName = availableNames[Math.floor(Math.random() * availableNames.length)];
+                el.innerText = randomName;
+                
+                const angle = (Math.random() * Math.PI * 2);
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                
+                el.style.transform = `translate(${x}px, ${y}px) scale(${0.8 + Math.random()*0.5})`;
+                // تقليل الشفافية برفع القيمة لتكون أقرب إلى 1 لزيادة الوضوح
+                el.style.opacity = 0.8 + Math.random() * 0.2; 
+            });
+        }
+
+        // منطق الاختيار
+        function handleGateClick() {
+            if (document.body.classList.contains('presentation-mode')) {
+                startSelection();
+            }
+        }
+
+        function startSelection() {
+            if (isSpinning) return;
+            if (availableNames.length === 0) {
+                alert("لم يتبقَ أي أسماء! يرجى إعادة ضبط القائمة.");
+                return;
+            }
+
+            isSpinning = true;
+            initAudio();
+
+            // 1. بدء الدوران السريع والصوت
+            gateContainer.classList.add('spinning-fast');
+            playSuspenseSound();
+
+            // إخفاء الأسماء العائمة
+            document.querySelectorAll('.floating-name').forEach(el => el.style.opacity = '0');
+
+            // 2. بعد 4 ثوانٍ (تبدأ بالتباطؤ) ثم إعلان الفائز
+            setTimeout(() => {
+                // اختيار عشوائي حقيقي
+                const randomIndex = Math.floor(Math.random() * availableNames.length);
+                const selectedName = availableNames[randomIndex];
+
+                // إذا كان خيار الحذف مفعل
+                if (removeAfterCb.checked) {
+                    availableNames.splice(randomIndex, 1);
+                    saveData();
+                    updateUI();
+                }
+
+                // 3. فلاش أبيض وإيقاف الدوران
+                flashOverlay.style.opacity = '1';
+                gateContainer.classList.remove('spinning-fast');
+                
+                setTimeout(() => {
+                    flashOverlay.style.opacity = '0';
+                    
+                    // 4. عرض الشاشة والاسم والصوت
+                    winnerNameDisplay.innerText = selectedName;
+                    winnerScreen.classList.add('show');
+                    playSuccessSound();
+                    fireConfetti();
+                    
+                    isSpinning = false;
+                }, 300); // مدة الفلاش
+
+            }, 4000);
+        }
+
+        function fireConfetti() {
+            const duration = 3000;
+            const end = Date.now() + duration;
+            
+            // استخدام ألوان بناءً على الستايل النشط
+            const isGirly = document.body.classList.contains('theme-girly');
+            const confettiColors = isGirly ? ['#ff007f', '#7df9ff', '#ffb6c1'] : ['#00f3ff', '#bc13fe', '#ff007f'];
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: confettiColors
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: confettiColors
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function closeWinnerScreen() {
+            winnerScreen.classList.remove('show');
+            updateFloatingNames();
+        }
+
+        // أوضاع العرض (التسجيل وملء الشاشة)
+        function enablePresentationMode() {
+            document.body.classList.add('presentation-mode');
+        }
+
+        function disablePresentationMode() {
+            document.body.classList.remove('presentation-mode');
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>
